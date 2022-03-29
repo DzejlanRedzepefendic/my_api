@@ -1,21 +1,30 @@
-import express, { Request, Response } from "express";
+import express, {Request, Response } from "express";
 import dotenv from "dotenv";
 import { Strategy } from "passport-google-oauth20";
 import passport from "passport";
-import mongoose from "mongoose";
+import mongoose, { ConnectOptions } from "mongoose";
 import cookieSession from "cookie-session";
 /* @ts-ignore */
 import findOrCreate from "mongoose-findorcreate";
 import bodyParser from "body-parser";
 
+
 dotenv.config();
 
-
-mongoose.connect("mongodb://localhost:27017/somethingDB", {
-  /* @ts-ignore */
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-});
+mongoose
+  .connect(process.env.MONGO_URL, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  }as ConnectOptions)
+  .then((res) => {
+    console.log("Connected to Distribution API Database - Initial Connection");
+  })
+  .catch((err) =>
+    console.log(
+      `Initial Distribution API Database connection error occured -`,
+      err
+    )
+  );
 
 const userSchema = new mongoose.Schema({
   googleId: String,
@@ -26,7 +35,6 @@ userSchema.plugin(findOrCreate);
 
 const User = mongoose.model("User", userSchema);
 const GoogleStrategy = Strategy;
-
 
 const app = express();
 
@@ -62,8 +70,8 @@ passport.use(
   )
 );
 
-passport.serializeUser((user:any, done) => {
-  done(null, user.id);
+passport.serializeUser((user, done) => {
+  done(null, user._id);
 });
 
 passport.deserializeUser((id, done) => {
@@ -84,8 +92,7 @@ app.get(
   "/auth/google/redirect",
   passport.authenticate("google"),
   (req: Request, res: Response) => {
-    if(req.user)
-    res.send(req.user.userName);
+    if (req.user) res.send(req.user.userName);
   }
 );
 
