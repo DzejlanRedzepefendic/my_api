@@ -7,12 +7,9 @@ import cookieSession from "cookie-session";
 /* @ts-ignore */
 import findOrCreate from "mongoose-findorcreate";
 import bodyParser from "body-parser";
+
 dotenv.config();
 
-/* todo 
-  u poseban fajl napraviti db konekciju i passport controllere/service
-  resiti @ts-ignore
-*/
 
 mongoose.connect("mongodb://localhost:27017/somethingDB", {
   /* @ts-ignore */
@@ -30,6 +27,7 @@ userSchema.plugin(findOrCreate);
 const User = mongoose.model("User", userSchema);
 const GoogleStrategy = Strategy;
 
+
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -37,7 +35,6 @@ app.use(bodyParser.json());
 app.use(
   cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
-    /* @ts-ignore */
     keys: [process.env.COOKIE_SECRET],
   })
 );
@@ -49,9 +46,7 @@ const PORT = process.env.PORT;
 passport.use(
   new GoogleStrategy(
     {
-      /* @ts-ignore */
       clientID: process.env.GOOGLE_CLIENT_ID,
-      /* @ts-ignore */
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "/auth/google/redirect",
     },
@@ -67,13 +62,11 @@ passport.use(
   )
 );
 
-passport.serializeUser((user, done) => {
-  /* @ts-ignore */
+passport.serializeUser((user:any, done) => {
   done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
-  /* @ts-ignore */
   User.findById(id).then((user) => {
     done(null, user);
   });
@@ -91,8 +84,7 @@ app.get(
   "/auth/google/redirect",
   passport.authenticate("google"),
   (req: Request, res: Response) => {
-    /* @ts-ignore */
-    res.send(req.user.userName);
+    res.send(req.user?.userName);
   }
 );
 
