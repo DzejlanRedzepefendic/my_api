@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cookieSession from "cookie-session";
 import bodyParser from "body-parser";
 import passport from "passport";
+import cors from 'cors';
 import { DBConnect } from "./db/connect";
 import { notFound } from "./middlewares/notFound";
 import googleLogoutRoute from "./routes/google/googleLogoutRoute";
@@ -12,7 +13,7 @@ import {
   googleAuthMiddleware,
   googleAuthCallbackMiddleware,
 } from "./middlewares/google/googleMiddlewares";
-
+import {corsOptionsConstant} from './constants/corsOptionsConstant';
 dotenv.config();
 
 require("./services/passport");
@@ -20,6 +21,7 @@ require("./services/passport");
 DBConnect(process.env.MONGO_URL);
 const app = express();
 
+app.use(cors(corsOptionsConstant))
 app.use(bodyParser.json());
 app.use(
   cookieSession({
