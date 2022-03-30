@@ -4,14 +4,13 @@ import cookieSession from "cookie-session";
 import bodyParser from "body-parser";
 import passport from "passport";
 import { DBConnect } from "./db/connect";
+import { notFound } from "./middlewares/notFound";
 
-require('./services/passport')
+require("./services/passport");
 
 dotenv.config();
 
-
-DBConnect(process.env.MONGO_URL)
-
+DBConnect(process.env.MONGO_URL);
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -53,6 +52,8 @@ app.get("/auth/logout", (req: Request, res: Response) => {
 app.get("/ping", (req: Request, res: Response) => {
   res.send("PONG");
 });
+
+app.use(notFound);
 
 app.listen(PORT, () => {
   console.log("Server is running at port " + PORT);
