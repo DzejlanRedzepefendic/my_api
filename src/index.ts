@@ -5,15 +5,21 @@ import bodyParser from "body-parser";
 import passport from "passport";
 import { DBConnect } from "./db/connect";
 import { notFound } from "./middlewares/notFound";
-
-require("./services/passport");
+import googleLogoutRoute from "./routes/google/googleLogoutRoute";
+import googleAuthCallbackRoute from "./routes/google/googleAuthCallbackRoute";
+import googleAuthRoute from "./routes/google//googleAuthRoute";
+import {
+  googleAuthMiddleware,
+  googleAuthCallbackMiddleware,
+} from "./middlewares/google/googleMiddlewares";
 
 dotenv.config();
+
+require("./services/passport");
 
 DBConnect(process.env.MONGO_URL);
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(
   cookieSession({
@@ -26,32 +32,15 @@ app.use(passport.session());
 
 const PORT = process.env.PORT;
 
-app.get(
-  "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    prompt: "select_account",
-  })
-);
-
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google"),
-  (req: Request, res: Response) => {
-    if (req.user) res.send(req.user.userName);
-  }
-);
-
-app.get("/auth/logout", (req: Request, res: Response) => {
-  req.logout();
-  req.session = null;
-
-  res.send(req.user);
-});
-
 app.get("/ping", (req: Request, res: Response) => {
   res.send("PONG");
 });
+
+app.use("/auth/google/callback", googleAuthCallbackMiddleware, googleAuthCallbackRoute);
+
+app.use("/auth/google", googleAuthMiddleware, googleAuthRoute);
+
+app.use("/auth/logout", googleLogoutRoute);
 
 app.use(notFound);
 
