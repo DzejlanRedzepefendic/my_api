@@ -1,12 +1,22 @@
 import mongoose from 'mongoose'
-/* @ts-ignore */
-import findOrCreate from 'mongoose-findorcreate'
 
-const userSchema = new mongoose.Schema({
-  googleId: String,
-  userName: String,
-});
+const UserSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      index: { unique: true },
+      required: true,
+    },
+    password: { type: String, required: true },
+    name: { type: String, required: true },
+  },
+  {
+    collection: 'user',
+    writeConcern: {
+      j: true,
+      wtimeout: 1000,
+    },
+  }
+)
 
-userSchema.plugin(findOrCreate);
-
-export const User = mongoose.model("User", userSchema);
+export const User = mongoose.model('User', UserSchema)

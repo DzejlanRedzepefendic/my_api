@@ -3,17 +3,18 @@ import dotenv from "dotenv";
 import cookieSession from "cookie-session";
 import bodyParser from "body-parser";
 import passport from "passport";
-import cors from 'cors';
+import cors from "cors";
 import { DBConnect } from "./db/connect";
 import { notFound } from "./middlewares/notFound";
 import googleLogoutRoute from "./routes/google/googleLogoutRoute";
 import googleAuthCallbackRoute from "./routes/google/googleAuthCallbackRoute";
 import googleAuthRoute from "./routes/google//googleAuthRoute";
+import registerAuth from "./routes/auth/register";
 import {
   googleAuthMiddleware,
   googleAuthCallbackMiddleware,
 } from "./middlewares/google/googleMiddlewares";
-import {corsOptionsConstant} from './constants/corsOptionsConstant';
+import { corsOptionsConstant } from "./constants/corsOptionsConstant";
 dotenv.config();
 
 require("./services/passport");
@@ -21,7 +22,7 @@ require("./services/passport");
 DBConnect(process.env.MONGO_URL);
 const app = express();
 
-app.use(cors(corsOptionsConstant))
+app.use(cors(corsOptionsConstant));
 app.use(bodyParser.json());
 app.use(
   cookieSession({
@@ -38,11 +39,14 @@ app.get("/ping", (req: Request, res: Response) => {
   res.send("PONG");
 });
 
-app.use("/auth/google/callback", googleAuthCallbackMiddleware, googleAuthCallbackRoute);
-
+app.use(
+  "/auth/google/callback",
+  googleAuthCallbackMiddleware,
+  googleAuthCallbackRoute
+);
 app.use("/auth/google", googleAuthMiddleware, googleAuthRoute);
-
 app.use("/auth/logout", googleLogoutRoute);
+app.use("/v1/auth/register", registerAuth);
 
 app.use(notFound);
 
