@@ -8,9 +8,9 @@ import { DBConnect } from "./db/connect";
 import { notFound } from "./middlewares/notFound";
 import googleLogoutRoute from "./routes/google/googleLogoutRoute";
 import googleAuthCallbackRoute from "./routes/google/googleAuthCallbackRoute";
-import googleAuthRoute from "./routes/google//googleAuthRoute";
-import registerAuthRoute from "./routes/auth/register";
-import loginAuthRoute from "./routes/auth/login";
+import googleAuthRoute from "./routes/google/googleAuthRoute";
+import registerAuthRoute from "./routes/auth/registerRoute";
+import loginAuthRoute from "./routes/auth/loginRoute";
 import {
   googleAuthMiddleware,
   googleAuthCallbackMiddleware,
