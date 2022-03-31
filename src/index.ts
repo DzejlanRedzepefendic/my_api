@@ -9,7 +9,8 @@ import { notFound } from "./middlewares/notFound";
 import googleLogoutRoute from "./routes/google/googleLogoutRoute";
 import googleAuthCallbackRoute from "./routes/google/googleAuthCallbackRoute";
 import googleAuthRoute from "./routes/google//googleAuthRoute";
-import registerAuth from "./routes/auth/register";
+import registerAuthRoute from "./routes/auth/register";
+import loginAuthRoute from "./routes/auth/login";
 import {
   googleAuthMiddleware,
   googleAuthCallbackMiddleware,
@@ -46,7 +47,9 @@ app.use(
 );
 app.use("/auth/google", googleAuthMiddleware, googleAuthRoute);
 app.use("/auth/logout", googleLogoutRoute);
-app.use("/v1/auth/register", registerAuth);
+
+app.use("/v1/auth/register", registerAuthRoute);
+app.use("/v1/auth/login", loginAuthRoute);
 
 app.use(notFound);
 
