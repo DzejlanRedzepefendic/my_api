@@ -1,6 +1,6 @@
 import { Strategy } from "passport-google-oauth20";
 import passport from "passport";
-import { User } from "../models/user";
+import { GoogleUser } from "../models/googleUser";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -15,7 +15,7 @@ passport.use(
     },
     function (accessToken: any, refreshToken: any, profile: any, cb: any) {
       /* @ts-ignore */
-      User.findOrCreate(
+      GoogleUser.findOrCreate(
         { googleId: profile.id, userName: profile.displayName },
         function (err: any, user: any) {
           return cb(err, user);
@@ -30,7 +30,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  User.findById(id).then((user) => {
+  GoogleUser.findById(id).then((user) => {
     done(null, user);
   });
 });
