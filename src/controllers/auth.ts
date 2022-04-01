@@ -6,6 +6,8 @@ import {
   findUser,
 } from "../services/authService";
 
+import { createJwtToken, verifyJwtToken } from "../services/jwtService";
+
 const register = async (req: Request, res: Response) => {
   const { email, password: plainTextPassword, name } = req.body;
   const password = await hashPassword(plainTextPassword);
@@ -31,18 +33,34 @@ const login = async (req: Request, res: Response) => {
   try {
     if (!user) {
       return res
-        .status(203)
+        .status(401)
         .json({ status: "error", error: "Invalid username or password" });
     }
     if (await compareHash(plainTextPassword, user.password)) {
-      return res.status(200).json({ message: "you have been successfully logged in" });
+      console.log(user);
+      const accessToken = await createJwtToken(
+        { id: user._id, email: user.email },
+        process.env.ACCESS_TOKEN_SECRET,
+        "15s"
+      );
+      const refreshToken = await createJwtToken(
+        { id: user._id },
+        process.env.REFRES_TOKEN_SECRET
+      );
+      return res
+        .status(200)
+        .json({
+          message: "you have been successfully logged in",
+          accessToken,
+          refreshToken,
+        });
     }
     return res
-      .status(203)
+      .status(401)
       .json({ status: "error", error: "Invalid username or password" });
   } catch (error) {
     return res.status(500).json({ error: "error" });
   }
 };
 
-export { register,login };
+export { register, login };
