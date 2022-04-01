@@ -16,6 +16,8 @@ import {
   googleAuthCallbackMiddleware,
 } from "./middlewares/google/googleMiddlewares";
 import { corsOptionsConstant } from "./constants/corsOptionsConstant";
+import morgan from 'morgan'
+
 dotenv.config();
 
 require("./services/passport");
@@ -24,6 +26,7 @@ DBConnect(process.env.MONGO_URL);
 const app = express();
 
 app.use(cors(corsOptionsConstant));
+app.use(morgan('tiny'));
 app.use(bodyParser.json());
 app.use(
   cookieSession({
