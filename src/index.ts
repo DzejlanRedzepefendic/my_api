@@ -23,7 +23,9 @@ dotenv.config();
 require("./services/passport");
 
 DBConnect(process.env.MONGO_URL);
+
 const app = express();
+const PORT = process.env.PORT;
 
 app.use(cors(corsOptionsConstant));
 app.use(morgan('tiny'));
@@ -37,7 +39,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-const PORT = process.env.PORT;
 
 app.get("/ping", (req: Request, res: Response) => {
   res.send("PONG");
