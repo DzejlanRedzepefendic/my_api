@@ -37,7 +37,6 @@ const login = async (req: Request, res: Response) => {
         .json({ status: "error", error: "Invalid username or password" });
     }
     if (await compareHash(plainTextPassword, user.password)) {
-      console.log(user);
       const accessToken = await createJwtToken(
         { id: user._id, email: user.email },
         process.env.ACCESS_TOKEN_SECRET,
@@ -62,5 +61,11 @@ const login = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "error" });
   }
 };
+
+// const resetPassword = asnyc (req,res) =>{}
+
+// const token = asnyc (req,res) =>{}
+
+
 
 export { register, login };

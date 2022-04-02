@@ -6,15 +6,8 @@ import passport from "passport";
 import cors from "cors";
 import { DBConnect } from "./db/connect";
 import { notFound } from "./middlewares/notFound";
-import googleLogoutRoute from "./routes/google/googleLogoutRoute";
-import googleAuthCallbackRoute from "./routes/google/googleAuthCallbackRoute";
-import googleAuthRoute from "./routes/google/googleAuthRoute";
-import registerAuthRoute from "./routes/auth/registerRoute";
-import loginAuthRoute from "./routes/auth/loginRoute";
-import {
-  googleAuthMiddleware,
-  googleAuthCallbackMiddleware,
-} from "./middlewares/google/googleMiddlewares";
+import googleRoute from './routes/googleAuthRoute'
+import authRoute from './routes/authRoute';
 import { corsOptionsConstant } from "./constants/corsOptionsConstant";
 import morgan from 'morgan'
 
@@ -44,16 +37,9 @@ app.get("/ping", (req: Request, res: Response) => {
   res.send("PONG");
 });
 
-app.use(
-  "/auth/google/callback",
-  googleAuthCallbackMiddleware,
-  googleAuthCallbackRoute
-);
-app.use("/auth/google", googleAuthMiddleware, googleAuthRoute);
-app.use("/auth/logout", googleLogoutRoute);
 
-app.use("/v1/auth/register", registerAuthRoute);
-app.use("/v1/auth/login", loginAuthRoute);
+app.use(googleRoute);
+app.use(authRoute);
 
 app.use(notFound);
 
