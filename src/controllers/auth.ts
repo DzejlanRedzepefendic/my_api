@@ -4,9 +4,14 @@ import {
   createUser,
   compareHash,
   findUser,
+  findByEmailAndChangePassword,
 } from "../services/authService";
 
-import { createJwtToken, verifyJwtToken } from "../services/jwtService";
+import {
+  createJwtToken,
+  verifyJwtToken,
+  decodeJwtToken,
+} from "../services/jwtService";
 
 const register = async (req: Request, res: Response) => {
   const { email, password: plainTextPassword, name } = req.body;
@@ -40,19 +45,17 @@ const login = async (req: Request, res: Response) => {
       const accessToken = await createJwtToken(
         { id: user._id, email: user.email },
         process.env.ACCESS_TOKEN_SECRET,
-        "15s"
+        "2m"
       );
       const refreshToken = await createJwtToken(
         { id: user._id },
         process.env.REFRES_TOKEN_SECRET
       );
-      return res
-        .status(200)
-        .json({
-          message: "you have been successfully logged in",
-          accessToken,
-          refreshToken,
-        });
+      return res.status(200).json({
+        message: "you have been successfully logged in",
+        accessToken,
+        refreshToken,
+      });
     }
     return res
       .status(401)
@@ -62,10 +65,25 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
-// const resetPassword = asnyc (req,res) =>{}
+const changePassword = async (req: Request, res: Response) => {
+  const secretToken = req.body.token;
+  const newPassword = req.body.password;
+  if (!verifyJwtToken(secretToken, process.env.ACCESS_TOKEN_SECRET))
+    return res.status(403).json({ status: "error", message: "Token expired!" });
+  try {
+    const decodedJwt: any = await decodeJwtToken(secretToken);
+    const user = await findUser(decodedJwt?.email);
+    if (!user)
+      return res
+        .status(400)
+        .json({ status: "error", message: "No such email" });
+    const password = await hashPassword(newPassword);
+    if(await findByEmailAndChangePassword(user.email,password)) return res.status(200).json({status:'ok',message:"Password changed!"})
+    } catch (err) {
+    return res.status(500).json({ error: err });
+  }
+};
 
 // const token = asnyc (req,res) =>{}
 
-
-
-export { register, login };
+export { register, login, changePassword};

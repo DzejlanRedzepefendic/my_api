@@ -6,7 +6,7 @@ const createUser = (email: string, password: string, name: string) => {
 };
 
 const findUser = (email: string): any => {
-  return User.findOne({ email });
+  return User.findOne({ email: email });
 };
 
 const hashPassword = (plainTextPassword: string) => {
@@ -17,4 +17,8 @@ const compareHash = (plainPassword: string, hasedDataBasePassword: string) => {
   return bcrypt.compare(plainPassword, hasedDataBasePassword);
 };
 
-export { createUser, findUser, hashPassword, compareHash };
+const findByEmailAndChangePassword = (email: string, newPassword: string) => {
+  return User.findOneAndUpdate({ email: email }, { password: newPassword });
+};
+
+export { createUser, findUser, hashPassword, compareHash, findByEmailAndChangePassword };
